@@ -88,7 +88,7 @@ class GridNoteWidget extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                Text('${DatabaseHelper.address}' ),
+                Text(note!.address == null ? 'No result found' : '${note.address}'),
                 Text(
                   note.lat == null ? 'lat null' : 'Lat: ${note.lat}',
                   style: const TextStyle(

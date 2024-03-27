@@ -20,7 +20,8 @@ class DatabaseHelper {
               title TEXT NOT NULL, 
               content TEXT NOT NULL,
               lat TEXT,
-              long TEXT
+              long TEXT,
+              address TEXT
               )''',
           )),
       version: _version,
@@ -39,7 +40,7 @@ class DatabaseHelper {
     }
   }
 
-  static Future<Position> _determinePosition() async {
+  static Future<Position> determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
     // await Geolocator.checkPermission();
@@ -67,14 +68,14 @@ class DatabaseHelper {
   }
 
   static Future<void> updatePosition() async {
-    Position pos = await _determinePosition();
+    Position pos = await determinePosition();
+
+    lat = pos.latitude.toString();
+    long = pos.longitude.toString();
 
     // *pm untuk menerjemahkan dari geolocator menjadi nama jalan dll
     List pm = await placemarkFromCoordinates(pos.latitude,
         pos.longitude); // !: masih belum save ke database jadi semua data akan menggunakan addres sekarang tidak sesuai dengan latlong
-
-    lat = pos.latitude.toString();
-    long = pos.longitude.toString();
     address = pm[0].street.toString();
     // ?print('berhasil get lat: $lat');
   }
@@ -110,7 +111,6 @@ class DatabaseHelper {
     if (maps.isEmpty) {
       return null;
     }
-
     return List.generate(maps.length, (index) => NoteModel.fromJson(maps[index]));
   }
 

@@ -5,75 +5,26 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
-class AddEditNoteScreen extends StatefulWidget {
+class AddEditNoteScreen extends StatelessWidget {
   final NoteModel? note;
   const AddEditNoteScreen({Key? key, this.note}) : super(key: key);
 
   @override
-  State<AddEditNoteScreen> createState() => _AddEditNoteScreenState();
-}
-
-class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
-  @override
   Widget build(BuildContext context) {
     final titleController = TextEditingController();
     final contentController = TextEditingController();
-    var _lat = '';
-    var _long = '';
-    var _address = '';
 
-    if (widget.note != null) {
-      titleController.text = widget.note!.title;
-      contentController.text = widget.note!.content;
+    if (note != null) {
+      titleController.text = note!.title;
+      contentController.text = note!.content;
     }
-
-/*     Future<Position> _determinePosition() async {
-      bool serviceEnabled;
-      LocationPermission permission;
-      await Geolocator.checkPermission();
-      await Geolocator.requestPermission();
-
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        return Future.error('Location services are disabled.');
-      }
-
-      permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return Future.error('Location permissions are denied');
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        return Future.error(
-            'Location permissions are permanently denied, we cannot request permissions.');
-      } 
-
-      return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
-
-    }
-
-    Future<void> _updatePosition() async {
-      Position pos = await _determinePosition();
-
-      // *pm untuk menerjemahkan dari geolocator menjadi nama jalan dll
-      List pm = await placemarkFromCoordinates(pos.latitude, pos.longitude);
-      setState(() {
-        _lat = pos.latitude.toString();
-        _long = pos.longitude.toString();
-        _address = pm[0].street.toString();
-        print('berhasil get loc');
-      });
-    } */
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[600],
         centerTitle: true,
         title: Text(
-          widget.note == null ? "Add Note" : "Edit Note",
+          note == null ? "Add Note" : "Edit Note",
           style: const TextStyle(color: Colors.white),
         ),
         actions: const [],
@@ -156,11 +107,12 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                       final NoteModel model = NoteModel(
                         title: title,
                         content: description,
-                        id: widget.note?.id,
+                        id: note?.id,
                         lat: DatabaseHelper.lat,
                         long: DatabaseHelper.long,
+                        address: DatabaseHelper.address, //DatabaseHelper.address,
                       );
-                      if (widget.note == null) {
+                      if (note == null) {
                         // await  DatabaseHelper.updatePosition();
                         // print(_lat);
                         await DatabaseHelper.addNote(model);
@@ -187,7 +139,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                               Radius.circular(10.0),
                             )))),
                     child: Text(
-                      widget.note == null ? 'Save' : 'Edit',
+                      note == null ? 'Save' : 'Edit',
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,

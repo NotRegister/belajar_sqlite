@@ -4,6 +4,7 @@ class NoteModel {
   final String content;
   final String? lat;
   final String? long;
+  final String? address;
 
   NoteModel({
     this.id,
@@ -11,6 +12,7 @@ class NoteModel {
     required this.content,
     this.lat,
     this.long,
+    this.address
   });
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class NoteModel {
       content: json['content'],
       lat: json['lat'],
       long: json['long'],
+      address: json['address'],
     );
   }
 
@@ -30,6 +33,7 @@ class NoteModel {
       'content': content,
       'lat': lat,
       'long': long,
+      'address': address,
     };
   }
 }
