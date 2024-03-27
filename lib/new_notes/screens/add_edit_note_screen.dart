@@ -27,13 +27,13 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
       contentController.text = widget.note!.content;
     }
 
-    Future<Position> _determinePosition() async {
+/*     Future<Position> _determinePosition() async {
       bool serviceEnabled;
       LocationPermission permission;
       await Geolocator.checkPermission();
       await Geolocator.requestPermission();
 
-      /* serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         return Future.error('Location services are disabled.');
       }
@@ -49,7 +49,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
       if (permission == LocationPermission.deniedForever) {
         return Future.error(
             'Location permissions are permanently denied, we cannot request permissions.');
-      } */
+      } 
 
       return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
 
@@ -66,7 +66,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         _address = pm[0].street.toString();
         print('berhasil get loc');
       });
-    }
+    } */
 
     return Scaffold(
       appBar: AppBar(
@@ -152,19 +152,20 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                       if (title.isEmpty || description.isEmpty) {
                         return;
                       }
+                      await DatabaseHelper.updatePosition();
                       final NoteModel model = NoteModel(
-                          title: title,
-                          content: description,
-                          id: widget.note?.id,
-                          lat: _lat, //widget.note?.lat,
-                          long: _long //widget.note?.long,
-                          );
+                        title: title,
+                        content: description,
+                        id: widget.note?.id,
+                        lat: DatabaseHelper.lat,
+                        long: DatabaseHelper.long,
+                      );
                       if (widget.note == null) {
-                        await  _updatePosition();
-                        print(_lat);
+                        // await  DatabaseHelper.updatePosition();
+                        // print(_lat);
                         await DatabaseHelper.addNote(model);
                       } else {
-                        await _updatePosition();
+                        // await DatabaseHelper.updatePosition();
                         await DatabaseHelper.updateNote(model);
                       }
 

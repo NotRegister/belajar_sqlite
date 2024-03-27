@@ -9,6 +9,7 @@ import 'package:sqflite/sqflite.dart';
 class DatabaseHelper {
   static const int _version = 1;
   static const String _databaseName = 'notes.db';
+  static String? lat, long, address = null;
 
   static Future<Database> _getDatabase() async {
     return openDatabase(
@@ -38,8 +39,48 @@ class DatabaseHelper {
     }
   }
 
+  static Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    await Geolocator.checkPermission();
+    await Geolocator.requestPermission();
+
+    /* serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    } */
+
+    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+  }
+
+  static Future<void> updatePosition() async {
+    Position pos = await _determinePosition();
+
+    // *pm untuk menerjemahkan dari geolocator menjadi nama jalan dll
+    List pm = await placemarkFromCoordinates(pos.latitude, pos.longitude); // !: masih belum save ke database jadi semua data akan menggunakan addres sekarang tidak sesuai dengan latlong
+
+    lat = pos.latitude.toString();
+    long = pos.longitude.toString();
+    address = pm[0].street.toString();
+    // ?print('berhasil get lat: $lat');
+  }
+
   static Future<int> addNote(NoteModel note) async {
     final db = await _getDatabase();
+    // await updatePosition();
     return await db.insert('notes', note.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }

@@ -1,3 +1,4 @@
+import 'package:belajar_sqlite/new_notes/services/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../models/note_model.dart';
 
@@ -87,23 +88,20 @@ class GridNoteWidget extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      note.lat == null ? 'dfdf' : 'Lat: ${note.lat}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Text(
-                      note.long ?? '',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
+                Text('${DatabaseHelper.address}' ),
+                Text(
+                  note.lat == null ? 'lat null' : 'Lat: ${note.lat}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                Text(
+                  note.long == null ? 'long null' : 'Long: ${note.long}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
                 )
               ],
             ),
