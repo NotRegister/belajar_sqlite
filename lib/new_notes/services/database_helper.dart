@@ -42,10 +42,10 @@ class DatabaseHelper {
   static Future<Position> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
-    await Geolocator.checkPermission();
-    await Geolocator.requestPermission();
+    // await Geolocator.checkPermission();
+    // await Geolocator.requestPermission();
 
-    /* serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');
     }
@@ -61,16 +61,17 @@ class DatabaseHelper {
     if (permission == LocationPermission.deniedForever) {
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
-    } */
+    }
 
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
   }
 
   static Future<void> updatePosition() async {
     Position pos = await _determinePosition();
 
     // *pm untuk menerjemahkan dari geolocator menjadi nama jalan dll
-    List pm = await placemarkFromCoordinates(pos.latitude, pos.longitude); // !: masih belum save ke database jadi semua data akan menggunakan addres sekarang tidak sesuai dengan latlong
+    List pm = await placemarkFromCoordinates(pos.latitude,
+        pos.longitude); // !: masih belum save ke database jadi semua data akan menggunakan addres sekarang tidak sesuai dengan latlong
 
     lat = pos.latitude.toString();
     long = pos.longitude.toString();
