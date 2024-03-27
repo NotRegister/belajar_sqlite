@@ -40,6 +40,8 @@ class DatabaseHelper {
     }
   }
 
+  // !================================ LOCATION =========================================
+
   static Future<Position> determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -79,6 +81,8 @@ class DatabaseHelper {
     address = pm[0].street.toString();
     // ?print('berhasil get lat: $lat');
   }
+
+  // !================================ CRUD =========================================
 
   static Future<int> addNote(NoteModel note) async {
     final db = await _getDatabase();

@@ -1,22 +1,44 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:belajar_sqlite/new_notes/models/note_model.dart';
 import 'package:belajar_sqlite/new_notes/screens/gridview_notes_screen.dart';
 import 'package:belajar_sqlite/new_notes/services/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 
-class AddEditNoteScreen extends StatelessWidget {
+class AddEditNoteScreen extends StatefulWidget {
   final NoteModel? note;
   const AddEditNoteScreen({Key? key, this.note}) : super(key: key);
+
+  @override
+  State<AddEditNoteScreen> createState() => _AddEditNoteScreenState();
+}
+
+class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
+  File? selectedImage;
+  Uint8List? imageBytes;
+
+  Future pickImageFromCamera() async {
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera, maxWidth: 500, maxHeight: 800);
+    if (returnedImage == null) return;
+    setState(() {
+      selectedImage = File(returnedImage.path);
+      print(selectedImage!.path ?? 'path not found');
+      imageBytes = File(returnedImage.path).readAsBytesSync();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final titleController = TextEditingController();
     final contentController = TextEditingController();
 
-    if (note != null) {
-      titleController.text = note!.title;
-      contentController.text = note!.content;
+    if (widget.note != null) {
+      titleController.text = widget.note!.title;
+      contentController.text = widget.note!.content;
     }
 
     return Scaffold(
@@ -24,7 +46,7 @@ class AddEditNoteScreen extends StatelessWidget {
         backgroundColor: Colors.blue[600],
         centerTitle: true,
         title: Text(
-          note == null ? "Add Note" : "Edit Note",
+          widget.note == null ? "Add Note" : "Edit Note",
           style: const TextStyle(color: Colors.white),
         ),
         actions: const [],
@@ -89,62 +111,94 @@ class AddEditNoteScreen extends StatelessWidget {
               onChanged: (str) {},
               maxLines: 5,
             ),
+            const SizedBox(
+              height: 50,
+            ),
+            SizedBox(
+              width: 300,
+              height: 300,
+              child: selectedImage == null ? null : Image.file(selectedImage!),
+            ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
-              child: SizedBox(
-                height: 45,
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                    onPressed: () async {
-                      final title = titleController.value.text;
-                      final description = contentController.value.text;
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton(
+                          onPressed: () async {
+                            final title = titleController.value.text;
+                            final description = contentController.value.text;
 
-                      if (title.isEmpty || description.isEmpty) {
-                        return;
-                      }
-                      await DatabaseHelper.updatePosition();
-                      final NoteModel model = NoteModel(
-                        title: title,
-                        content: description,
-                        id: note?.id,
-                        lat: DatabaseHelper.lat,
-                        long: DatabaseHelper.long,
-                        address: DatabaseHelper.address, //DatabaseHelper.address,
-                      );
-                      if (note == null) {
-                        // await  DatabaseHelper.updatePosition();
-                        // print(_lat);
-                        await DatabaseHelper.addNote(model);
-                      } else {
-                        // await DatabaseHelper.updatePosition();
-                        await DatabaseHelper.updateNote(model);
-                      }
+                            if (title.isEmpty || description.isEmpty) {
+                              return;
+                            }
+                            await DatabaseHelper.updatePosition();
+                            final NoteModel model = NoteModel(
+                              title: title,
+                              content: description,
+                              id: widget.note?.id,
+                              lat: DatabaseHelper.lat,
+                              long: DatabaseHelper.long,
+                              address: DatabaseHelper.address, //DatabaseHelper.address,
+                            );
+                            if (widget.note == null) {
+                              // await  DatabaseHelper.updatePosition();
+                              // print(_lat);
+                              await DatabaseHelper.addNote(model);
+                            } else {
+                              // await DatabaseHelper.updatePosition();
+                              await DatabaseHelper.updateNote(model);
+                            }
 
-                      // Navigator.pop(context);
-                      // ignore: use_build_context_synchronously
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const GridViewNoteScreen()));
-                    },
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.blue),
-                        shape: MaterialStateProperty.all(const RoundedRectangleBorder(
-                            side: BorderSide(
+                            // Navigator.pop(context);
+                            // ignore: use_build_context_synchronously
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const GridViewNoteScreen()));
+                          },
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.blue),
+                              shape:
+                                  MaterialStateProperty.all(const RoundedRectangleBorder(
+                                      side: BorderSide(
+                                        color: Colors.white,
+                                        width: 0.75,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      )))),
+                          child: Text(
+                            widget.note == null ? 'Save' : 'Edit',
+                            style: const TextStyle(
+                              fontSize: 20,
                               color: Colors.white,
-                              width: 0.75,
                             ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10.0),
-                            )))),
-                    child: Text(
-                      note == null ? 'Save' : 'Edit',
-                      style: const TextStyle(
-                        fontSize: 20,
+                          )),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.green[700],
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        pickImageFromCamera();
+                      },
+                      icon: const Icon(
+                        Icons.camera_alt_rounded,
+                        size: 26.0,
                         color: Colors.white,
                       ),
-                    )),
+                    ),
+                  )
+                ],
               ),
             )
           ],
