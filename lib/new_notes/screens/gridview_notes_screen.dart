@@ -1,6 +1,7 @@
 // ignore_for_file: camel_case_types, prefer_typing_uninitialized_variables
 
 import 'package:belajar_sqlite/new_notes/screens/add_note_screen.dart';
+import 'package:belajar_sqlite/new_notes/screens/edit_note_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -142,7 +143,7 @@ class _GridViewNoteScreenState extends State<GridViewNoteScreen> {
                               await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => AddEditNoteScreen(
+                                      builder: (context) => EditNoteScreen(
                                             note: snapshot.data![index],
                                           )));
                               setState(() {});
@@ -155,21 +156,27 @@ class _GridViewNoteScreenState extends State<GridViewNoteScreen> {
                                     title: const Text(
                                         'Are you sure you want to delete this note?'),
                                     actions: [
-                                      ElevatedButton(
-                                        style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty.all(Colors.red)),
-                                        onPressed: () async {
-                                          await DatabaseHelper.deleteNote(
-                                              snapshot.data![index]);
-                                          Navigator.pop(context);
-                                          setState(() {});
-                                        },
-                                        child: const Text(
-                                          'Yes',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ),
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            ElevatedButton(
+                                              style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all(Colors.red)),
+                                              onPressed: () async {
+                                                await DatabaseHelper.deleteNote(
+                                                    snapshot.data![index]);
+                                                Navigator.pop(context);
+                                                setState(() {});
+                                              },
+                                              child: const Text(
+                                                'Yes',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       ElevatedButton(
