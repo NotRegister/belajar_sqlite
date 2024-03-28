@@ -1,5 +1,6 @@
 // ignore_for_file: camel_case_types, prefer_typing_uninitialized_variables
 
+import 'package:belajar_sqlite/new_notes/screens/add_note_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -36,7 +37,7 @@ class _GridViewNoteScreenState extends State<GridViewNoteScreen> {
           backgroundColor: Colors.blue[100],
           onPressed: () async {
             await Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const AddEditNoteScreen()));
+                MaterialPageRoute(builder: (context) => const AddNoteScreen()));
             setState(() {});
           },
           child: const Icon(Icons.add),
