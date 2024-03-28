@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class AddEditNoteScreen extends StatefulWidget {
   final NoteModel? note;
@@ -21,13 +22,27 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   File? selectedImage;
   Uint8List? imageBytes;
 
-  Future pickImageFromCamera() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera, maxWidth: 500, maxHeight: 800);
-    if (returnedImage == null) return;
+  Future<String> saveImageToLocalDevice(File imageFile) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imagePath = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    await imageFile.copy(imagePath);
+    return imagePath;
+  }
+
+  Future<void> pickImageFromCamera() async {
+    final pickedImage = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      maxWidth: 500,
+      maxHeight: 800,
+    );
+    if (pickedImage == null) return;
+
+    final imageFile = File(pickedImage.path);
+    final savedImagePath = await saveImageToLocalDevice(imageFile);
+
     setState(() {
-      selectedImage = File(returnedImage.path);
-      print(selectedImage!.path ?? 'path not found');
-      imageBytes = File(returnedImage.path).readAsBytesSync();
+      selectedImage = imageFile;
+      print('lokasi path gambar : $savedImagePath');
     });
   }
 
