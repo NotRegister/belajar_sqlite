@@ -147,11 +147,18 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             const SizedBox(
               height: 50,
             ),
-            SizedBox(
-              width: 300,
-              height: 300,
-              child: selectedImage == null ? null : Image.file(selectedImage!),
-            ),
+            Container(
+                  width: 300,
+                  height: 400,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                  child: selectedImage == null
+                      ? null
+                      : Image.file(
+                          selectedImage!,
+                          fit: BoxFit.cover,
+                        ),
+                ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
