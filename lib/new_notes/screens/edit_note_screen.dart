@@ -80,31 +80,48 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: Text(
-                  'Tuliskan notes anda disini',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.blue[800],
+      body: SingleChildScrollView(
+        controller: ScrollController(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: Text(
+                    'Tuliskan notes anda disini',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.blue[800],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 15.0),
-              child: TextFormField(
-                controller: titleController,
-                maxLines: 1,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15.0),
+                child: TextFormField(
+                  controller: titleController,
+                  maxLines: 1,
+                  decoration: const InputDecoration(
+                      hintText: 'Title',
+                      labelText: 'Note title',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.white,
+                            width: 0.75,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10.0),
+                          ))),
+                ),
+              ),
+              TextFormField(
+                controller: contentController,
                 decoration: const InputDecoration(
-                    hintText: 'Title',
-                    labelText: 'Note title',
+                    hintText: 'Type here the note',
+                    labelText: 'Note description',
                     border: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: Colors.white,
@@ -113,132 +130,113 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         borderRadius: BorderRadius.all(
                           Radius.circular(10.0),
                         ))),
+                keyboardType: TextInputType.multiline,
+                onChanged: (str) {},
+                maxLines: 5,
               ),
-            ),
-            TextFormField(
-              controller: contentController,
-              decoration: const InputDecoration(
-                  hintText: 'Type here the note',
-                  labelText: 'Note description',
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(
+              const SizedBox(
+                height: 50,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 300,
+                    height: 400,
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                    child: selectedImage == null
+                        ? Image.file(
+                            _imagePath,
+                            fit: BoxFit.cover,
+                          ) //Text('path gambar : $_imagePath',)
+                        : Image.file(
+                            selectedImage!,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                  const SizedBox(width: 20),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.green[700],
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        pickImageFromCamera();
+                      },
+                      icon: const Icon(
+                        Icons.camera_alt_rounded,
+                        size: 26.0,
                         color: Colors.white,
-                        width: 0.75,
                       ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10.0),
-                      ))),
-              keyboardType: TextInputType.multiline,
-              onChanged: (str) {},
-              maxLines: 5,
-            ),
-            const SizedBox(
-              height: 50,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 300,
-                  height: 400,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-                  child: selectedImage == null
-                      ? Image.file(
-                          _imagePath,
-                          fit: BoxFit.cover,
-                        ) //Text('path gambar : $_imagePath',)
-                      : Image.file(
-                          selectedImage!,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-                const SizedBox(width: 20),
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: Colors.green[700],
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      pickImageFromCamera();
-                    },
-                    icon: const Icon(
-                      Icons.camera_alt_rounded,
-                      size: 26.0,
-                      color: Colors.white,
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 50),
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              final title = titleController.value.text;
+                              final description = contentController.value.text;
+
+                              if (title.isEmpty || description.isEmpty) {
+                                return;
+                              }
+                              await DatabaseHelper.updatePosition();
+                              final NoteModel model = NoteModel(
+                                title: title,
+                                content: description,
+                                id: widget.note?.id,
+                                lat: DatabaseHelper.lat,
+                                long: DatabaseHelper.long,
+                                address: DatabaseHelper.address,
+                                imgPath: selectedImagePath,
+                              );
+                              if (widget.note == null) {
+                                await DatabaseHelper.addNote(model);
+                              } else {
+                                await DatabaseHelper.updateNote(model);
+                              }
+
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const GridViewNoteScreen()));
+                            },
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.blue),
+                                shape: MaterialStateProperty.all(
+                                    const RoundedRectangleBorder(
+                                        side: BorderSide(
+                                          color: Colors.white,
+                                          width: 0.75,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0),
+                                        )))),
+                            child: const Text(
+                              'Edit',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                            )),
+                      ),
                     ),
                   ),
-                )
-              ],
-            ),
-            const Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: SizedBox(
-                      height: 50,
-                      child: ElevatedButton(
-                          onPressed: () async {
-                            final title = titleController.value.text;
-                            final description = contentController.value.text;
-
-                            if (title.isEmpty || description.isEmpty) {
-                              return;
-                            }
-                            await DatabaseHelper.updatePosition();
-                            final NoteModel model = NoteModel(
-                              title: title,
-                              content: description,
-                              id: widget.note?.id,
-                              lat: DatabaseHelper.lat,
-                              long: DatabaseHelper.long,
-                              address: DatabaseHelper.address,
-                              imgPath: selectedImagePath,
-                            );
-                            if (widget.note == null) {
-                              // await  DatabaseHelper.updatePosition();
-                              // print(_lat);
-                              await DatabaseHelper.addNote(model);
-                            } else {
-                              // await DatabaseHelper.updatePosition();
-                              await DatabaseHelper.updateNote(model);
-                            }
-
-                            // Navigator.pop(context);
-                            // ignore: use_build_context_synchronously
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const GridViewNoteScreen()));
-                          },
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.blue),
-                              shape:
-                                  MaterialStateProperty.all(const RoundedRectangleBorder(
-                                      side: BorderSide(
-                                        color: Colors.white,
-                                        width: 0.75,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10.0),
-                                      )))),
-                          child: const Text(
-                            'Edit',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                            ),
-                          )),
-                    ),
-                  ),
-                ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
