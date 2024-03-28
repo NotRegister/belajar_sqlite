@@ -6,7 +6,6 @@ class NoteModel {
   final String? long;
   final String? address;
   late String? imgPath;
-  late String? imgString;
 
   NoteModel({
     this.id,
@@ -16,7 +15,6 @@ class NoteModel {
     this.long,
     this.address,
     this.imgPath,
-    this.imgString,
   });
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
@@ -28,7 +26,6 @@ class NoteModel {
       long: json['long'],
       address: json['address'],
       imgPath: json['imgPath'],
-      imgString: json['imgString'],
     );
   }
 
@@ -41,7 +38,6 @@ class NoteModel {
       'long': long,
       'address': address,
       'imgPath': imgPath,
-      'imgString': imgString,
     };
   }
 }

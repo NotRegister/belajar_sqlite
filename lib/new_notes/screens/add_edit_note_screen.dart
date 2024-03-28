@@ -20,14 +20,14 @@ class AddEditNoteScreen extends StatefulWidget {
 
 class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   File? selectedImage;
-  Uint8List? imageBytes;
+  String? selectedImagePath;
 
-  Future<String> saveImageToLocalDevice(File imageFile) async {
+  /* Future<String> saveImageToLocalDevice(File imageFile) async {
     final directory = await getApplicationDocumentsDirectory();
     final imagePath = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
     await imageFile.copy(imagePath);
     return imagePath;
-  }
+  } */
 
   Future<void> pickImageFromCamera() async {
     final pickedImage = await ImagePicker().pickImage(
@@ -35,14 +35,18 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
       maxWidth: 500,
       maxHeight: 800,
     );
-    if (pickedImage == null) return;
 
+    if (pickedImage == null) return;
     final imageFile = File(pickedImage.path);
-    final savedImagePath = await saveImageToLocalDevice(imageFile);
+    selectedImagePath = imageFile.path;
+    print('pathnya adalah : ${imageFile.path}');
+    // final savedImagePath = await saveImageToLocalDevice(imageFile);
 
     setState(() {
       selectedImage = imageFile;
-      print('lokasi path gambar : $savedImagePath');
+      // *debug : walaupun tanpa fungsi saveImageToLocalDevice() tetap mengambil gambar dengan cara imageFile.path
+      // selectedImageDebug = File('/data/user/0/com.example.belajar_sqlite/cache/scaled_b7732ee0-4107-42d5-a0d3-4ef2b5d77ca35747745360280450578.jpg');
+      // print('lokasi path gambar : $savedImagePath');
     });
   }
 
@@ -157,7 +161,8 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                               id: widget.note?.id,
                               lat: DatabaseHelper.lat,
                               long: DatabaseHelper.long,
-                              address: DatabaseHelper.address, //DatabaseHelper.address,
+                              address: DatabaseHelper.address,
+                              imgPath: selectedImagePath,
                             );
                             if (widget.note == null) {
                               // await  DatabaseHelper.updatePosition();

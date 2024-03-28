@@ -21,7 +21,8 @@ class DatabaseHelper {
               content TEXT NOT NULL,
               lat TEXT,
               long TEXT,
-              address TEXT
+              address TEXT,
+              imgPath TEXT
               )''',
           )),
       version: _version,
