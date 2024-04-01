@@ -37,8 +37,8 @@ class _GridViewNoteScreenState extends State<GridViewNoteScreen> {
         floatingActionButton: FloatingActionButton.large(
           backgroundColor: Colors.blue[100],
           onPressed: () async {
-            await Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const AddNoteScreen()));
+            await Navigator.push(
+                context, MaterialPageRoute(builder: (context) => const AddNoteScreen()));
             setState(() {});
           },
           child: const Icon(Icons.add),
@@ -158,11 +158,13 @@ class _GridViewNoteScreenState extends State<GridViewNoteScreen> {
                                     actions: [
                                       Expanded(
                                         child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
                                             ElevatedButton(
                                               style: ButtonStyle(
                                                   backgroundColor:
-                                                      MaterialStateProperty.all(Colors.red)),
+                                                      MaterialStateProperty.all(
+                                                          Colors.red)),
                                               onPressed: () async {
                                                 await DatabaseHelper.deleteNote(
                                                     snapshot.data![index]);
@@ -176,16 +178,17 @@ class _GridViewNoteScreenState extends State<GridViewNoteScreen> {
                                                 ),
                                               ),
                                             ),
+                                            const SizedBox(width: 10),
+                                            ElevatedButton(
+                                              onPressed: () => Navigator.pop(context),
+                                              child: const Text(
+                                                'No',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ),
                                           ],
-                                        ),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text(
-                                          'No',
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                          ),
                                         ),
                                       ),
                                     ],
